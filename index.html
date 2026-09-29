@@ -3,130 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora CTP - Impressão 3D</title>
+    <title>Calculadora CTP Pro - Impressão 3D</title>
     <style>
         :root {
             --primary: #2563eb;
+            --primary-dark: #1d4ed8;
             --bg-color: #f3f4f6;
             --card-bg: #ffffff;
             --text-main: #1f2937;
             --text-muted: #6b7280;
             --border: #e5e7eb;
             --success: #10b981;
+            --warning: #f59e0b;
+            --shopee: #ee4d2d;
+            --ml: #ffe600;
         }
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 0 auto; }
+        .container { max-width: 1000px; margin: 0 auto; }
         h1 { text-align: center; color: var(--primary); margin-bottom: 20px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
         .card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .card h2 { margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; }
+        .card h2 { margin-top: 0; font-size: 1.1rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; color: var(--primary-dark); }
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; transition: border 0.2s; }
+        .form-row { display: flex; gap: 15px; margin-bottom: 15px; }
+        .form-row .form-group { flex: 1; margin-bottom: 0; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.85rem; color: var(--text-main); }
+        .form-group input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; transition: border 0.2s; }
         .form-group input:focus { border-color: var(--primary); outline: none; }
         .input-group { display: flex; align-items: center; }
-        .input-prefix { background: var(--bg-color); padding: 10px; border: 1px solid var(--border); border-right: none; border-radius: 6px 0 0 6px; color: var(--text-muted); font-weight: bold; }
+        .input-prefix { background: var(--bg-color); padding: 8px 10px; border: 1px solid var(--border); border-right: none; border-radius: 6px 0 0 6px; color: var(--text-muted); font-weight: bold; font-size: 0.9rem;}
         .input-group input { border-radius: 0 6px 6px 0; }
-        .results { background: var(--primary); color: white; }
-        .results h2 { border-color: rgba(255,255,255,0.2); }
-        .result-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;}
-        .result-total { display: flex; justify-content: space-between; margin-top: 20px; font-size: 1.3rem; font-weight: bold; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; }
-        .result-sale { display: flex; justify-content: space-between; margin-top: 15px; font-size: 1.5rem; font-weight: bold; background: var(--success); padding: 15px; border-radius: 8px; }
+        
+        .results { background: var(--text-main); color: white; }
+        .results h2 { border-color: rgba(255,255,255,0.2); color: white; }
+        .result-section { margin-bottom: 20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; }
+        .result-section h3 { margin: 0 0 10px 0; font-size: 0.9rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; }
+        .result-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95rem; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 4px;}
+        
+        .highlight-profit { color: var(--success); font-weight: bold; font-size: 1.1rem; }
+        .ctp-total { font-size: 1.2rem; font-weight: bold; color: #fbbf24; border-top: 2px solid rgba(255,255,255,0.2); padding-top: 10px; margin-top: 10px; }
+        
+        .sales-channels { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
+        .channel { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-radius: 8px; font-weight: bold; }
+        .ch-pix { background: var(--success); color: white; }
+        .ch-shopee { background: var(--shopee); color: white; }
+        .ch-ml { background: var(--ml); color: #333; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Calculadora de Custos 3D</h1>
+    <h1>Calculadora Pro - Precificação 3D</h1>
 
     <div class="grid">
-        <!-- Coluna 1: Configurações Base -->
+        <!-- Coluna 1: Configurações Fixas -->
         <div class="card">
-            <h2>⚙️ Parâmetros Fixos (Máquina e Base)</h2>
-            <div class="form-group">
-                <label>Preço do Filamento (R$/kg)</label>
-                <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="precoFil" value="80.00" oninput="calcular()"></div>
+            <h2>⚙️ Parâmetros Fixos e Taxas</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Rolo Filamento (R$/kg)</label>
+                    <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="precoFil" value="80.00" oninput="calcular()"></div>
+                </div>
+                <div class="form-group">
+                    <label>Densidade (g/m) <span title="PLA/PETG ~2.98 | ABS ~2.4">ℹ️</span></label>
+                    <input type="number" id="densidade" value="2.98" step="0.01" oninput="syncFromWeight()">
+                </div>
             </div>
-            <div class="form-group">
-                <label>Tarifa de Energia (R$/kWh)</label>
-                <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="tarifa" value="1.05" step="0.01" oninput="calcular()"></div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Energia (R$/kWh)</label>
+                    <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="tarifa" value="1.05" step="0.01" oninput="calcular()"></div>
+                </div>
+                <div class="form-group">
+                    <label>Consumo Máquina (W)</label>
+                    <input type="number" id="consumoW" value="180" oninput="calcular()">
+                </div>
             </div>
-            <div class="form-group">
-                <label>Consumo da Máquina (Watts)</label>
-                <div class="input-group"><input type="number" id="consumoW" value="180" oninput="calcular()"><span class="input-prefix" style="border-radius:0 6px 6px 0; border-left:none; border-right:1px solid var(--border);">W</span></div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Hora Setup (R$/h)</label>
+                    <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="setupRate" value="30.00" oninput="calcular()"></div>
+                </div>
+                <div class="form-group">
+                    <label>Hora Arte (R$/h)</label>
+                    <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="artRate" value="40.00" oninput="calcular()"></div>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Depreciação/Manutenção (R$/hora)</label>
-                <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="deprecRate" value="1.50" step="0.10" oninput="calcular()"></div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Depreciação (R$/h)</label>
+                    <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="deprecRate" value="1.50" step="0.10" oninput="calcular()"></div>
+                </div>
+                <div class="form-group">
+                    <label>Risco Perda (%)</label>
+                    <input type="number" id="failRate" value="20" oninput="calcular()">
+                </div>
             </div>
-            <div class="form-group">
-                <label>Valor Hora Técnica (Fatiamento) (R$/hora)</label>
-                <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="setupRate" value="30.00" oninput="calcular()"></div>
-            </div>
-            <div class="form-group">
-                <label>Valor Hora Artística (Pintura) (R$/hora)</label>
-                <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="artRate" value="40.00" oninput="calcular()"></div>
-            </div>
-            <div class="form-group">
-                <label>Seguro / Potencial de Perda (%)</label>
-                <div class="input-group"><input type="number" id="failRate" value="20" oninput="calcular()"><span class="input-prefix" style="border-radius:0 6px 6px 0; border-left:none; border-right:1px solid var(--border);">%</span></div>
+
+            <h3 style="font-size: 0.9rem; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-top: 20px;">Taxas de Plataformas (%)</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Taxa Mercado Livre</label>
+                    <input type="number" id="taxaML" value="14" oninput="calcular()">
+                </div>
+                <div class="form-group">
+                    <label>Taxa Shopee</label>
+                    <input type="number" id="taxaShopee" value="20" oninput="calcular()">
+                </div>
             </div>
         </div>
 
-        <!-- Coluna 2: Dados do Pedido Atual -->
+        <!-- Coluna 2: Dados do Pedido -->
         <div class="card">
-            <h2>📦 Dados da Peça / Pedido</h2>
-            <div class="form-group">
-                <label>Peso Total da Peça (g)</label>
-                <input type="number" id="peso" value="0" oninput="calcular()">
+            <h2>📦 Dados de Produção da Peça</h2>
+            
+            <div class="form-row" style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <div class="form-group">
+                    <label style="color: #0284c7;">Peso (Gramas)</label>
+                    <input type="number" id="peso" value="0" step="0.1" oninput="syncFromWeight()">
+                </div>
+                <div style="display:flex; align-items:center; font-weight:bold; color:#cbd5e1; margin-top:20px;">OU</div>
+                <div class="form-group">
+                    <label style="color: #0284c7;">Comprimento (Metros)</label>
+                    <input type="number" id="comprimento" value="0" step="0.1" oninput="syncFromLength()">
+                </div>
             </div>
-            <div class="form-group">
-                <label>Tempo de Impressão (Horas:Minutos)</label>
-                <input type="time" id="tempoImp" value="00:00" oninput="calcular()">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Tempo Impressão (HH:MM)</label>
+                    <input type="time" id="tempoImp" value="00:00" oninput="calcular()">
+                </div>
+                <div class="form-group">
+                    <label>Tempo Setup/Fatiador (HH:MM)</label>
+                    <input type="time" id="setupTime" value="00:15" oninput="calcular()">
+                </div>
             </div>
-            <div class="form-group">
-                <label>Tempo de Fatiamento/Setup (Minutos)</label>
-                <input type="number" id="setupTime" value="15" oninput="calcular()">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Tempo Pintura/Peça (HH:MM)</label>
+                    <input type="time" id="artTime" value="00:00" oninput="calcular()">
+                </div>
+                <div class="form-group">
+                    <label>Qtde do Lote (Dilui Setup)</label>
+                    <input type="number" id="qtd" value="1" min="1" oninput="calcular()">
+                </div>
             </div>
-            <div class="form-group">
-                <label>Quantidade de Peças (Lote)</label>
-                <input type="number" id="qtd" value="1" oninput="calcular()">
-            </div>
-            <div class="form-group">
-                <label>Tempo de Pintura POR PEÇA (Horas:Min)</label>
-                <input type="time" id="artTime" value="00:00" oninput="calcular()">
-            </div>
-            <div class="form-group">
-                <label>Custos Extras por Peça (Caixa, Ímã, etc)</label>
-                <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="extraCost" value="1.50" oninput="calcular()"></div>
-            </div>
-            <div class="form-group">
-                <label>Margem de Lucro Desejada (%)</label>
-                <div class="input-group"><input type="number" id="profitMargin" value="300" oninput="calcular()"><span class="input-prefix" style="border-radius:0 6px 6px 0; border-left:none; border-right:1px solid var(--border);">%</span></div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Custos Extras (Caixa/Ímã)</label>
+                    <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="extraCost" value="1.50" oninput="calcular()"></div>
+                </div>
+                <div class="form-group">
+                    <label>Margem Lucro Desejada (%)</label>
+                    <input type="number" id="profitMargin" value="300" oninput="calcular()">
+                </div>
             </div>
         </div>
 
         <!-- Coluna 3: Resultados -->
         <div class="card results" style="grid-column: 1 / -1;">
-            <h2>📊 Resumo de Custos por Unidade</h2>
-            <div class="result-row"><span>Plástico (Material):</span><span id="resMat">R$ 0,00</span></div>
-            <div class="result-row"><span>Energia Elétrica:</span><span id="resEner">R$ 0,00</span></div>
-            <div class="result-row"><span>Depreciação Máquina:</span><span id="resDep">R$ 0,00</span></div>
-            <div class="result-row"><span>Seguro (Taxa de Perda):</span><span id="resFail">R$ 0,00</span></div>
-            <div class="result-row"><span>Hora Técnica (Diluída por peça):</span><span id="resSetup">R$ 0,00</span></div>
-            <div class="result-row"><span>Insumos Extras:</span><span id="resExtra">R$ 0,00</span></div>
-            <div class="result-row"><span>Mão de Obra Pintura:</span><span id="resArt">R$ 0,00</span></div>
+            <h2>📊 Detalhamento de Custos e Precificação (Por Unidade)</h2>
             
-            <div class="result-total"><span>CUSTO TOTAL DE PRODUÇÃO (CTP):</span><span id="resTotal">R$ 0,00</span></div>
-            <div class="result-sale"><span>SUGESTÃO DE VENDA (PIX):</span><span id="resSale">R$ 0,00</span></div>
+            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 30px;">
+                <!-- Esquerda: Custos -->
+                <div>
+                    <div class="result-section">
+                        <h3>1. Custos Diretos</h3>
+                        <div class="result-row"><span>Material (Plástico):</span><span id="resMat">R$ 0,00</span></div>
+                        <div class="result-row"><span>Energia Elétrica:</span><span id="resEner">R$ 0,00</span></div>
+                        <div class="result-row"><span>Depreciação Máquina:</span><span id="resDep">R$ 0,00</span></div>
+                        <div class="result-row"><span>Seguro Quebra/Perda:</span><span id="resFail">R$ 0,00</span></div>
+                        <div class="result-row"><span>Insumos Extras:</span><span id="resExtra">R$ 0,00</span></div>
+                    </div>
+                    
+                    <div class="result-section">
+                        <h3>2. Mão de Obra (Horas)</h3>
+                        <div class="result-row"><span>Setup Computador (Diluído):</span><span id="resSetup">R$ 0,00</span></div>
+                        <div class="result-row"><span>Acabamento/Pintura:</span><span id="resArt">R$ 0,00</span></div>
+                    </div>
+                    
+                    <div class="result-row ctp-total">
+                        <span>CUSTO BASE (CTP):</span>
+                        <span id="resTotal">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <!-- Direita: Lucro e Vendas -->
+                <div>
+                    <div class="result-section" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);">
+                        <h3 style="color: #34d399;">3. Seu Lucro Líquido</h3>
+                        <div class="result-row"><span>Margem Aplicada:</span><span id="resMarginP">0%</span></div>
+                        <div class="result-row" style="border-bottom:none; margin-top:10px;">
+                            <span>Valor limpo no bolso:</span>
+                            <span id="resProfitReal" class="highlight-profit">R$ 0,00</span>
+                        </div>
+                    </div>
+
+                    <div class="result-section">
+                        <h3>4. Preços de Venda Sugeridos</h3>
+                        <p style="font-size: 0.8rem; color: #9ca3af; margin-top: -5px; margin-bottom: 10px;">
+                            Valores calculados com embutimento de taxa para você receber exatamente o lucro líquido acima.
+                        </p>
+                        <div class="sales-channels">
+                            <div class="channel ch-pix">
+                                <span>Pix / Dinheiro (Sem Taxa)</span>
+                                <span id="chPix">R$ 0,00</span>
+                            </div>
+                            <div class="channel ch-shopee">
+                                <span>Shopee (<span id="lblShopee">20</span>%)</span>
+                                <span id="chShopee">R$ 0,00</span>
+                            </div>
+                            <div class="channel ch-ml">
+                                <span>Mercado Livre (<span id="lblML">14</span>%)</span>
+                                <span id="chML">R$ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Função para converter "HH:MM" em horas decimais
+    // Converte tempo HH:MM para horas decimais
     function timeToDecimal(timeStr) {
         if (!timeStr) return 0;
         let parts = timeStr.split(':');
@@ -135,13 +244,32 @@
         return hours + (minutes / 60);
     }
 
-    // Função para formatar moeda
+    // Formata Moeda
     function formatMoney(value) {
         return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
+    // Sincroniza Gramas para Metros
+    function syncFromWeight() {
+        let peso = parseFloat(document.getElementById('peso').value) || 0;
+        let densidade = parseFloat(document.getElementById('densidade').value) || 2.98;
+        if(densidade > 0) {
+            document.getElementById('comprimento').value = (peso / densidade).toFixed(2);
+        }
+        calcular();
+    }
+
+    // Sincroniza Metros para Gramas
+    function syncFromLength() {
+        let comp = parseFloat(document.getElementById('comprimento').value) || 0;
+        let densidade = parseFloat(document.getElementById('densidade').value) || 2.98;
+        document.getElementById('peso').value = (comp * densidade).toFixed(2);
+        calcular();
+    }
+
+    // Motor de Cálculo
     function calcular() {
-        // Entradas - Base
+        // Fixos
         let precoFil = parseFloat(document.getElementById('precoFil').value) || 0;
         let tarifa = parseFloat(document.getElementById('tarifa').value) || 0;
         let consumoKW = (parseFloat(document.getElementById('consumoW').value) || 0) / 1000;
@@ -150,38 +278,45 @@
         let artRate = parseFloat(document.getElementById('artRate').value) || 0;
         let failRate = (parseFloat(document.getElementById('failRate').value) || 0) / 100;
         
-        // Entradas - Peça
+        let taxaML = (parseFloat(document.getElementById('taxaML').value) || 0) / 100;
+        let taxaShopee = (parseFloat(document.getElementById('taxaShopee').value) || 0) / 100;
+
+        // Produção
         let peso = parseFloat(document.getElementById('peso').value) || 0;
-        let tempoImpStr = document.getElementById('tempoImp').value;
-        let setupTimeMin = parseFloat(document.getElementById('setupTime').value) || 0;
+        let tImpDec = timeToDecimal(document.getElementById('tempoImp').value);
+        let tSetupDec = timeToDecimal(document.getElementById('setupTime').value);
+        let tArtDec = timeToDecimal(document.getElementById('artTime').value);
         let qtd = parseInt(document.getElementById('qtd').value) || 1;
-        let artTimeStr = document.getElementById('artTime').value;
         let extraCost = parseFloat(document.getElementById('extraCost').value) || 0;
         let profitMargin = (parseFloat(document.getElementById('profitMargin').value) || 0) / 100;
 
-        // Tempos Decimais
-        let tImpDec = timeToDecimal(tempoImpStr);
-        let tArtDec = timeToDecimal(artTimeStr);
-        let setupTimeDec = setupTimeMin / 60;
-
-        // Cálculos
+        // Custos Diretos
         let cMat = (precoFil / 1000) * peso;
         let cEner = consumoKW * tImpDec * tarifa;
         let cDep = deprecRate * tImpDec;
-        
         let cOp = cMat + cEner + cDep;
         let cFail = cOp * failRate;
         
-        // Setup é diluído pela quantidade do lote
-        let cSetup = (setupRate * setupTimeDec) / qtd;
-        
-        // Arte é individual por peça
-        let cArt = artRate * tArtDec;
+        // Mão de Obra
+        let cSetup = (setupRate * tSetupDec) / qtd; // Diluído pela quantidade
+        let cArt = artRate * tArtDec; // Específico por peça
 
+        // CTP
         let cTotal = cOp + cFail + cSetup + extraCost + cArt;
-        let pVenda = cTotal * (1 + profitMargin);
+        
+        // Lucro Base (PIX)
+        let lucroReais = cTotal * profitMargin;
+        let precoBaseLimpo = cTotal + lucroReais;
 
-        // Atualização da Tela
+        // Canais de Venda (Cálculo de Gross-up)
+        // Fórmula: Preço Final = Valor Limpo Desejado / (1 - TaxaDaPlataforma)
+        let precoShopee = taxaShopee < 1 ? precoBaseLimpo / (1 - taxaShopee) : 0;
+        let precoML = taxaML < 1 ? precoBaseLimpo / (1 - taxaML) : 0;
+
+        // Atualização da Interface
+        document.getElementById('lblShopee').innerText = (taxaShopee * 100).toFixed(0);
+        document.getElementById('lblML').innerText = (taxaML * 100).toFixed(0);
+
         document.getElementById('resMat').innerText = formatMoney(cMat);
         document.getElementById('resEner').innerText = formatMoney(cEner);
         document.getElementById('resDep').innerText = formatMoney(cDep);
@@ -189,12 +324,21 @@
         document.getElementById('resSetup').innerText = formatMoney(cSetup);
         document.getElementById('resExtra').innerText = formatMoney(extraCost);
         document.getElementById('resArt').innerText = formatMoney(cArt);
+        
         document.getElementById('resTotal').innerText = formatMoney(cTotal);
-        document.getElementById('resSale').innerText = formatMoney(pVenda);
+        
+        document.getElementById('resMarginP').innerText = (profitMargin * 100).toFixed(0) + '%';
+        document.getElementById('resProfitReal').innerText = formatMoney(lucroReais);
+
+        document.getElementById('chPix').innerText = formatMoney(precoBaseLimpo);
+        document.getElementById('chShopee').innerText = formatMoney(precoShopee);
+        document.getElementById('chML').innerText = formatMoney(precoML);
     }
 
-    // Calcula os valores assim que a página abre
-    window.onload = calcular;
+    // Inicia os cálculos e o sincronismo na abertura
+    window.onload = function() {
+        syncFromWeight();
+    };
 </script>
 
 </body>
