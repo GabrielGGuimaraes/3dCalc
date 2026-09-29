@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora CTP - Impressão 3D</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --success: #10b981;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .card h2 { margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 1rem; transition: border 0.2s; }
+        .form-group input:focus { border-color: var(--primary); outline: none; }
+        .input-group { display: flex; align-items: center; }
+        .input-prefix { background: var(--bg-color); padding: 10px; border: 1px solid var(--border); border-right: none; border-radius: 6px 0 0 6px; color: var(--text-muted); font-weight: bold; }
+        .input-group input { border-radius: 0 6px 6px 0; }
+        .results { background: var(--primary); color: white; }
+        .results h2 { border-color: rgba(255,255,255,0.2); }
+        .result-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;}
+        .result-total { display: flex; justify-content: space-between; margin-top: 20px; font-size: 1.3rem; font-weight: bold; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; }
+        .result-sale { display: flex; justify-content: space-between; margin-top: 15px; font-size: 1.5rem; font-weight: bold; background: var(--success); padding: 15px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Calculadora de Custos 3D</h1>
+
+    <div class="grid">
+        <!-- Coluna 1: Configurações Base -->
+        <div class="card">
+            <h2>⚙️ Parâmetros Fixos (Máquina e Base)</h2>
+            <div class="form-group">
+                <label>Preço do Filamento (R$/kg)</label>
+                <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="precoFil" value="80.00" oninput="calcular()"></div>
+            </div>
+            <div class="form-group">
+                <label>Tarifa de Energia (R$/kWh)</label>
+                <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="tarifa" value="1.05" step="0.01" oninput="calcular()"></div>
+            </div>
+            <div class="form-group">
+                <label>Consumo da Máquina (Watts)</label>
+                <div class="input-group"><input type="number" id="consumoW" value="180" oninput="calcular()"><span class="input-prefix" style="border-radius:0 6px 6px 0; border-left:none; border-right:1px solid var(--border);">W</span></div>
+            </div>
+            <div class="form-group">
+                <label>Depreciação/Manutenção (R$/hora)</label>
+                <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="deprecRate" value="1.50" step="0.10" oninput="calcular()"></div>
+            </div>
+            <div class="form-group">
+                <label>Valor Hora Técnica (Fatiamento) (R$/hora)</label>
+                <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="setupRate" value="30.00" oninput="calcular()"></div>
+            </div>
+            <div class="form-group">
+                <label>Valor Hora Artística (Pintura) (R$/hora)</label>
+                <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="artRate" value="40.00" oninput="calcular()"></div>
+            </div>
+            <div class="form-group">
+                <label>Seguro / Potencial de Perda (%)</label>
+                <div class="input-group"><input type="number" id="failRate" value="20" oninput="calcular()"><span class="input-prefix" style="border-radius:0 6px 6px 0; border-left:none; border-right:1px solid var(--border);">%</span></div>
+            </div>
+        </div>
+
+        <!-- Coluna 2: Dados do Pedido Atual -->
+        <div class="card">
+            <h2>📦 Dados da Peça / Pedido</h2>
+            <div class="form-group">
+                <label>Peso Total da Peça (g)</label>
+                <input type="number" id="peso" value="0" oninput="calcular()">
+            </div>
+            <div class="form-group">
+                <label>Tempo de Impressão (Horas:Minutos)</label>
+                <input type="time" id="tempoImp" value="00:00" oninput="calcular()">
+            </div>
+            <div class="form-group">
+                <label>Tempo de Fatiamento/Setup (Minutos)</label>
+                <input type="number" id="setupTime" value="15" oninput="calcular()">
+            </div>
+            <div class="form-group">
+                <label>Quantidade de Peças (Lote)</label>
+                <input type="number" id="qtd" value="1" oninput="calcular()">
+            </div>
+            <div class="form-group">
+                <label>Tempo de Pintura POR PEÇA (Horas:Min)</label>
+                <input type="time" id="artTime" value="00:00" oninput="calcular()">
+            </div>
+            <div class="form-group">
+                <label>Custos Extras por Peça (Caixa, Ímã, etc)</label>
+                <div class="input-group"><span class="input-prefix">R$</span><input type="number" id="extraCost" value="1.50" oninput="calcular()"></div>
+            </div>
+            <div class="form-group">
+                <label>Margem de Lucro Desejada (%)</label>
+                <div class="input-group"><input type="number" id="profitMargin" value="300" oninput="calcular()"><span class="input-prefix" style="border-radius:0 6px 6px 0; border-left:none; border-right:1px solid var(--border);">%</span></div>
+            </div>
+        </div>
+
+        <!-- Coluna 3: Resultados -->
+        <div class="card results" style="grid-column: 1 / -1;">
+            <h2>📊 Resumo de Custos por Unidade</h2>
+            <div class="result-row"><span>Plástico (Material):</span><span id="resMat">R$ 0,00</span></div>
+            <div class="result-row"><span>Energia Elétrica:</span><span id="resEner">R$ 0,00</span></div>
+            <div class="result-row"><span>Depreciação Máquina:</span><span id="resDep">R$ 0,00</span></div>
+            <div class="result-row"><span>Seguro (Taxa de Perda):</span><span id="resFail">R$ 0,00</span></div>
+            <div class="result-row"><span>Hora Técnica (Diluída por peça):</span><span id="resSetup">R$ 0,00</span></div>
+            <div class="result-row"><span>Insumos Extras:</span><span id="resExtra">R$ 0,00</span></div>
+            <div class="result-row"><span>Mão de Obra Pintura:</span><span id="resArt">R$ 0,00</span></div>
+            
+            <div class="result-total"><span>CUSTO TOTAL DE PRODUÇÃO (CTP):</span><span id="resTotal">R$ 0,00</span></div>
+            <div class="result-sale"><span>SUGESTÃO DE VENDA (PIX):</span><span id="resSale">R$ 0,00</span></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Função para converter "HH:MM" em horas decimais
+    function timeToDecimal(timeStr) {
+        if (!timeStr) return 0;
+        let parts = timeStr.split(':');
+        let hours = parseInt(parts[0]) || 0;
+        let minutes = parseInt(parts[1]) || 0;
+        return hours + (minutes / 60);
+    }
+
+    // Função para formatar moeda
+    function formatMoney(value) {
+        return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function calcular() {
+        // Entradas - Base
+        let precoFil = parseFloat(document.getElementById('precoFil').value) || 0;
+        let tarifa = parseFloat(document.getElementById('tarifa').value) || 0;
+        let consumoKW = (parseFloat(document.getElementById('consumoW').value) || 0) / 1000;
+        let deprecRate = parseFloat(document.getElementById('deprecRate').value) || 0;
+        let setupRate = parseFloat(document.getElementById('setupRate').value) || 0;
+        let artRate = parseFloat(document.getElementById('artRate').value) || 0;
+        let failRate = (parseFloat(document.getElementById('failRate').value) || 0) / 100;
+        
+        // Entradas - Peça
+        let peso = parseFloat(document.getElementById('peso').value) || 0;
+        let tempoImpStr = document.getElementById('tempoImp').value;
+        let setupTimeMin = parseFloat(document.getElementById('setupTime').value) || 0;
+        let qtd = parseInt(document.getElementById('qtd').value) || 1;
+        let artTimeStr = document.getElementById('artTime').value;
+        let extraCost = parseFloat(document.getElementById('extraCost').value) || 0;
+        let profitMargin = (parseFloat(document.getElementById('profitMargin').value) || 0) / 100;
+
+        // Tempos Decimais
+        let tImpDec = timeToDecimal(tempoImpStr);
+        let tArtDec = timeToDecimal(artTimeStr);
+        let setupTimeDec = setupTimeMin / 60;
+
+        // Cálculos
+        let cMat = (precoFil / 1000) * peso;
+        let cEner = consumoKW * tImpDec * tarifa;
+        let cDep = deprecRate * tImpDec;
+        
+        let cOp = cMat + cEner + cDep;
+        let cFail = cOp * failRate;
+        
+        // Setup é diluído pela quantidade do lote
+        let cSetup = (setupRate * setupTimeDec) / qtd;
+        
+        // Arte é individual por peça
+        let cArt = artRate * tArtDec;
+
+        let cTotal = cOp + cFail + cSetup + extraCost + cArt;
+        let pVenda = cTotal * (1 + profitMargin);
+
+        // Atualização da Tela
+        document.getElementById('resMat').innerText = formatMoney(cMat);
+        document.getElementById('resEner').innerText = formatMoney(cEner);
+        document.getElementById('resDep').innerText = formatMoney(cDep);
+        document.getElementById('resFail').innerText = formatMoney(cFail);
+        document.getElementById('resSetup').innerText = formatMoney(cSetup);
+        document.getElementById('resExtra').innerText = formatMoney(extraCost);
+        document.getElementById('resArt').innerText = formatMoney(cArt);
+        document.getElementById('resTotal').innerText = formatMoney(cTotal);
+        document.getElementById('resSale').innerText = formatMoney(pVenda);
+    }
+
+    // Calcula os valores assim que a página abre
+    window.onload = calcular;
+</script>
+
+</body>
+</html>
